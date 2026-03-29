@@ -21,13 +21,110 @@ body.h #cur{width:10px;height:10px;background:var(--blue)}
 body.h #cur-ring{width:44px;height:44px;border-color:rgba(26,111,255,.5)}
 
 /* LOADER */
-#loader{position:fixed;inset:0;background:var(--bg);z-index:99990;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .8s}
+#loader{
+  position:fixed;inset:0;background:var(--bg);z-index:99990;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;transition:opacity 1s ease;overflow:hidden;
+}
 #loader.out{opacity:0;pointer-events:none}
-.l-logo{font-family:"Rajdhani",sans-serif;font-size:3.8rem;font-weight:700;letter-spacing:8px;background:linear-gradient(135deg,#fff 0%,var(--cyan) 50%,var(--blue) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.l-sub{font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:4px;color:var(--muted);text-transform:uppercase}
-.l-bar{width:200px;height:1px;background:var(--border);position:relative;overflow:hidden}
-.l-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--blue),var(--cyan));animation:lbar 1.6s ease forwards}
-@keyframes lbar{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+
+/* Background grid pulse */
+#loader::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(26,111,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(26,111,255,.05) 1px,transparent 1px);
+  background-size:50px 50px;
+  animation:loaderGridPulse 2s ease-in-out infinite;
+}
+@keyframes loaderGridPulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* Radial glow behind fan */
+.l-glow{
+  position:absolute;width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,255,.12) 0%,rgba(26,111,255,.06) 40%,transparent 70%);
+  animation:loaderGlowPulse 1.5s ease-in-out infinite;
+}
+@keyframes loaderGlowPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+
+/* Wind particles */
+.l-wind{position:absolute;width:100%;height:100%;pointer-events:none}
+.l-wind-line{
+  position:absolute;height:1px;border-radius:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,.5),transparent);
+  animation:windBlow linear infinite;
+  opacity:0;
+}
+@keyframes windBlow{
+  0%{transform:translateX(-120px);opacity:0}
+  15%{opacity:1}
+  85%{opacity:.6}
+  100%{transform:translateX(100vw);opacity:0}
+}
+
+/* Fan SVG container */
+.l-fan-wrap{position:relative;z-index:2;margin-bottom:36px}
+
+/* SVG fan spinning */
+#loaderFanBlades{
+  transform-origin:50% 50%;
+  animation:fanSpin 0.9s linear infinite;
+}
+/* Slow start then rev up */
+#loaderFanBlades.speeding{animation:fanSpinFast 0.3s linear infinite}
+@keyframes fanSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes fanSpinFast{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Hub glow ring — rotates opposite direction */
+.hub-ring{
+  transform-origin:center;
+  animation:hubRingAnim 2s linear infinite reverse;
+}
+@keyframes hubRingAnim{from{stroke-dashoffset:0}to{stroke-dashoffset:-220}}
+
+/* Outer ring radar sweep */
+.radar-ring{
+  transform-origin:center;
+  animation:radarSweep 2s linear infinite;
+  transform-box:fill-box;
+}
+@keyframes radarSweep{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Loader text */
+.l-brand{
+  font-family:"Rajdhani",sans-serif;font-size:2.8rem;font-weight:700;
+  letter-spacing:10px;text-transform:uppercase;
+  background:linear-gradient(135deg,#fff 0%,var(--cyan) 55%,var(--blue) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:loaderBrandPulse 1.5s ease-in-out infinite;
+  position:relative;z-index:2;
+}
+@keyframes loaderBrandPulse{0%,100%{opacity:.75;letter-spacing:10px}50%{opacity:1;letter-spacing:12px}}
+
+.l-tagline{
+  font-family:"JetBrains Mono",monospace;font-size:.62rem;
+  letter-spacing:5px;text-transform:uppercase;color:var(--muted);
+  margin-top:10px;position:relative;z-index:2;
+  animation:loaderTagPulse 1.5s .3s ease-in-out infinite;
+}
+@keyframes loaderTagPulse{0%,100%{opacity:.4}50%{opacity:.9}}
+
+/* Progress bar */
+.l-progress-wrap{
+  margin-top:28px;width:220px;height:2px;
+  background:var(--border);position:relative;overflow:hidden;z-index:2;
+}
+.l-progress-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  box-shadow:0 0 8px var(--cyan);
+  animation:loaderProgress 2.2s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes loaderProgress{0%{width:0%}60%{width:75%}85%{width:90%}100%{width:100%}}
+
+.l-status{
+  font-family:"JetBrains Mono",monospace;font-size:.52rem;
+  letter-spacing:3px;color:var(--blue);margin-top:10px;z-index:2;
+  animation:statusCycle 2.2s steps(1) forwards;
+}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:500;height:64px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;transition:background .4s}
@@ -235,9 +332,107 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:32px 48px
 <div id="cur-ring"></div>
 
 <div id="loader">
-  <div class="l-logo">C-LITE</div>
-  <div class="l-bar"></div>
-  <div class="l-sub">Vanya Electrical — Loading</div>
+  <!-- Radial glow -->
+  <div class="l-glow"></div>
+
+  <!-- Wind particle lines -->
+  <div class="l-wind" id="lWind"></div>
+
+  <!-- Fan SVG -->
+  <div class="l-fan-wrap">
+    <svg id="loaderFanSvg" width="220" height="220" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bladeGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#1a6fff" stop-opacity="0.7"/>
+        </radialGradient>
+        <radialGradient id="hubGrad" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#2a9fff"/>
+          <stop offset="100%" stop-color="#0a3080"/>
+        </radialGradient>
+        <filter id="bladeGlow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="hubGlow">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <!-- Dashed ring stroke -->
+        <circle id="ringPath" cx="110" cy="110" r="35"/>
+      </defs>
+
+      <!-- Outer decorative ring — radar sweep -->
+      <g class="radar-ring" style="transform-origin:110px 110px">
+        <circle cx="110" cy="110" r="100" fill="none" stroke="rgba(26,111,255,.08)" stroke-width="1"/>
+        <path d="M110,110 L110,10 A100,100 0 0,1 195,60 Z" fill="url(#bladeGrad)" opacity="0.07"/>
+      </g>
+
+      <!-- Static outer ring -->
+      <circle cx="110" cy="110" r="100" fill="none" stroke="rgba(0,212,255,.12)" stroke-width=".5" stroke-dasharray="4 6"/>
+      <circle cx="110" cy="110" r="88" fill="none" stroke="rgba(26,111,255,.08)" stroke-width=".5"/>
+
+      <!-- THE SPINNING PART -->
+      <g id="loaderFanBlades">
+
+        <!-- Blade 1 — top -->
+        <path d="M110,110 
+                 C105,90 95,55 110,18 
+                 C120,18 135,30 130,55 
+                 C127,70 118,90 110,110Z"
+              fill="url(#bladeGrad)" filter="url(#bladeGlow)" opacity="0.92"/>
+        <!-- Blade 1 highlight -->
+        <path d="M110,110 C107,92 100,62 111,28 C114,28 118,35 116,55 C114,68 112,90 110,110Z"
+              fill="rgba(255,255,255,.15)"/>
+
+        <!-- Blade 2 — bottom-right -->
+        <path d="M110,110 
+                 C128,118 161,124 193,107 
+                 C198,117 194,134 170,141 
+                 C156,145 136,138 110,110Z"
+              fill="url(#bladeGrad)" filter="url(#bladeGlow)" opacity="0.92"/>
+        <path d="M110,110 C126,117 154,122 186,110 C188,115 185,122 170,127 C158,131 136,126 110,110Z"
+              fill="rgba(255,255,255,.15)"/>
+
+        <!-- Blade 3 — bottom-left -->
+        <path d="M110,110 
+                 C92,118 59,152 42,183 
+                 C32,178 28,161 45,143 
+                 C56,130 78,120 110,110Z"
+              fill="url(#bladeGrad)" filter="url(#bladeGlow)" opacity="0.92"/>
+        <path d="M110,110 C94,118 65,148 50,174 C44,170 42,163 54,150 C64,138 82,122 110,110Z"
+              fill="rgba(255,255,255,.15)"/>
+
+        <!-- Hub ring glow (inner) -->
+        <circle cx="110" cy="110" r="22" fill="none" stroke="rgba(0,212,255,.35)" stroke-width="1"
+                stroke-dasharray="8 4" class="hub-ring"/>
+
+        <!-- Hub body -->
+        <circle cx="110" cy="110" r="18" fill="url(#hubGrad)" filter="url(#hubGlow)"/>
+        <!-- Hub shine -->
+        <circle cx="104" cy="104" r="6" fill="rgba(255,255,255,.2)"/>
+        <!-- Hub centre dot -->
+        <circle cx="110" cy="110" r="4" fill="#00d4ff" opacity=".9"/>
+        <circle cx="110" cy="110" r="2" fill="#fff"/>
+
+      </g>
+
+      <!-- Static inner mount ring -->
+      <circle cx="110" cy="110" r="26" fill="none" stroke="rgba(0,212,255,.2)" stroke-width=".5"/>
+
+      <!-- Mount rod (static) -->
+      <rect x="108" y="8" width="4" height="10" rx="2" fill="rgba(0,212,255,.3)"/>
+      <circle cx="110" cy="8" r="4" fill="rgba(26,111,255,.5)" stroke="rgba(0,212,255,.4)" stroke-width=".5"/>
+
+    </svg>
+  </div>
+
+  <div class="l-brand">C-LITE</div>
+  <div class="l-tagline">Vanya Electrical &nbsp;·&nbsp; Delhi</div>
+  <div class="l-progress-wrap">
+    <div class="l-progress-bar" id="lBar"></div>
+  </div>
+  <div class="l-status" id="lStatus">INITIALISING SYSTEMS</div>
 </div>
 
 <div class="mob-nav" id="mobNav">
@@ -599,8 +794,49 @@ document.querySelectorAll("a,button,select,.prod-card").forEach(el=>{
   el.addEventListener("mouseenter",()=>document.body.classList.add("h"));
   el.addEventListener("mouseleave",()=>document.body.classList.remove("h"));
 });
+// LOADER: wind particles
+(function(){
+  const wind = document.getElementById("lWind");
+  if(!wind) return;
+  const lines = [
+    {w:80,t:"38%",d:1.8,dl:0.1},  {w:120,t:"42%",d:1.4,dl:0.6},
+    {w:60,t:"47%",d:2.0,dl:0.3},  {w:100,t:"52%",d:1.6,dl:0.9},
+    {w:140,t:"56%",d:1.3,dl:0.5}, {w:70,t:"61%",d:1.9,dl:1.2},
+    {w:90,t:"33%",d:1.7,dl:0.7},  {w:110,t:"65%",d:1.5,dl:0.2},
+    {w:50,t:"70%",d:2.1,dl:1.0},  {w:130,t:"29%",d:1.4,dl:1.4},
+    {w:85,t:"75%",d:1.8,dl:0.4},  {w:95,t:"25%",d:1.6,dl:0.8},
+  ];
+  lines.forEach(l=>{
+    const el=document.createElement("div");
+    el.className="l-wind-line";
+    el.style.cssText="width:"+l.w+"px;top:"+l.t+";left:0;animation-duration:"+l.d+"s;animation-delay:"+l.dl+"s;";
+    wind.appendChild(el);
+  });
+})();
+
+// Status cycling
+const statusMessages=["INITIALISING SYSTEMS","LOADING MOTORS","CALIBRATING BLADES","CHARGING AIRFLOW","READY"];
+let sIdx=0;
+const lStatus=document.getElementById("lStatus");
+const sInterval=setInterval(()=>{
+  sIdx=Math.min(sIdx+1,statusMessages.length-1);
+  if(lStatus) lStatus.textContent=statusMessages[sIdx];
+  if(sIdx===statusMessages.length-1) clearInterval(sInterval);
+},520);
+
+// Speed up blades as loading progresses
+setTimeout(()=>{
+  const blades=document.getElementById("loaderFanBlades");
+  if(blades) blades.classList.add("speeding");
+},1200);
+
+// Dismiss loader
 window.addEventListener("load",()=>{
-  setTimeout(()=>{document.getElementById("loader").classList.add("out");setTimeout(()=>document.getElementById("loader").style.display="none",900)},2000);
+  setTimeout(()=>{
+    const loader=document.getElementById("loader");
+    loader.classList.add("out");
+    setTimeout(()=>{loader.style.display="none"},1000);
+  },2600);
 });
 window.addEventListener("scroll",()=>document.getElementById("nav").classList.toggle("s",scrollY>50));
 let open=false;
